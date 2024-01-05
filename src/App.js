@@ -1,8 +1,7 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import './App.css';
 import SearchIcon from './search.svg';
 import MovieCard from './movieCard';
-
 
 // 8961a6d5
 const API_URL = 'http://www.omdbapi.com?apikey=8961a6d5';
@@ -10,16 +9,24 @@ const API_URL = 'http://www.omdbapi.com?apikey=8961a6d5';
 function App() {
   const [movies, setMovies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const searchMovies = async(title) => {
-      const response = await fetch(`${API_URL}&s=${title}`);
-      const data = await response.json();
 
-      setMovies(data.Search);
+  const searchMovies = async (title) => {
+    const response = await fetch(`${API_URL}&s=${title}`);
+    const data = await response.json();  
+    setMovies(data.Search); 
   }
 
+  const handleSearch = () =>{
+    searchMovies(searchTerm);
+  }
+  const handleKeyDown = (e) =>{
+    if (e.key === 'Enter'){
+      handleSearch();
+    }
+  } 
+
   useEffect(() => {
-      searchMovies('Spiderman');
+    searchMovies('batman');
   }, []);
 
   return (
@@ -29,28 +36,20 @@ function App() {
         <input
           placeholder="Search for movies"
           value={searchTerm}
-          onChange={(e) => {setSearchTerm(e.target.value)}}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <img
           src={SearchIcon}
           alt="search"
-          onClick={() => searchMovies(searchTerm)}
+          onClick={handleSearch}
         />
       </div>
-      {
-        movies?.length>0
-          ?(
-            <div className="container">
-              {movies.map((movie) => (
-                <MovieCard movie={movie}/>
-              ))}
-            </div>  
-          ):(
-            <div className="empty">
-              <h2>No Movies Found</h2>
-            </div>
-          )
-      }
+      <div className="container">
+        {movies.map((movie) => (
+          <MovieCard key={movie.imdbID} movie={movie} />
+        ))}
+      </div>
     </div>
   );
 }
